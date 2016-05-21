@@ -1,0 +1,30 @@
+{
+  "name": "iHBot",
+  "version": "1.0.0",
+  "description": "My telegram bot",
+  "keywords": [
+    "Telegram",
+    "Node.js",
+    "application",
+    "bot"
+  ],
+  "author": {
+    "name": "Daniele Monteleone",
+    "email": "daniele.monteleone.it@gmail.com",
+    "url": ""
+  },
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iH8c0ff33/telegramBot"
+  },
+  "engines": {
+    "node": ">= 0.6.0",
+    "npm": ">= 1.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "bundleDependencies": [],
+  "private": true,
+  "main": "bot.js"
+}
