@@ -3,15 +3,19 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var Database = require('sequelize');
 var bot = require(__dirname+'/bot.js');
+var spaggiari = require(__dirname+'/spaggiari.js');
 
 var db = new Database('postgres://daniele@localhost:5432/telegram');
 var User = db.import(__dirname+'/models/user.js');
 var PrivateChat = db.import(__dirname+'/models/privateChat.js');
 var Data = db.import(__dirname+'/models/data.js');
+var Credential = db.import(__dirname+'/models/credential.js');
 User.hasOne(PrivateChat);
 PrivateChat.belongsTo(User);
 User.hasOne(Data);
 Data.belongsTo(User);
+PrivateChat.hasOne(Credential);
+Credential.belongsTo(PrivateChat);
 db.sync();
 
 var app = express();
@@ -67,6 +71,32 @@ app.all('/api/telegrambot/130906513:AAG6u4Jr8txCneVcha57SXAb9vsDbs1lINg', serial
             bot.sendMessage({
               chat_id: req.user.id,
               text: 'trying to log in...'
+            }).then(function () {
+              return spaggiari.login(req.data.action.login.school, req.data.action.login.username, req.data.action.login.password)
+            }).then(function (body) {
+              req.chat.createCredential({
+                custcode: req.data.action.login.school,
+                login: req.data.action.login.username,
+                password: req.data.action.login.password
+              }).then(function () {
+                var actionToWrite = req.data.action;
+                actionToWrite.login = undefined;
+                req.data.update({action: actionToWrite}).then(function (updatedData) {
+                  bot.sendMessage({
+                    chat_id: req.body.message.chat.id,
+                    text: 'Successfully logged in! Saved credentials fot future uses :)'
+                  });
+                });
+              });
+            }, function (err) {
+              var actionToWrite = req.data.action;
+              actionToWrite.login = undefined;
+              req.data.update({action: actionToWrite}).then(function (updatedData) {
+                bot.sendMessage({
+                  chat_id: req.body.message.chat.id,
+                  text: 'Wrong credentials ;( Try again to /login'
+                });
+              });
             });
           } else if (req.body.message.text.search(/no/i) > -1) {
             var actionToWrite = req.data.action;
