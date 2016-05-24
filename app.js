@@ -16,11 +16,6 @@ User.hasOne(Data);
 Data.belongsTo(User);
 PrivateChat.hasOne(Credential);
 Credential.belongsTo(PrivateChat);
-User.sync({force: true});
-PrivateChat.sync({force: true});
-Data.sync({force: true});
-Credential.sync({force: true});
-db.sync();
 
 var app = express();
 app.use(bodyParser.json());
@@ -166,4 +161,14 @@ app.all('/api/telegrambot/130906513:AAG6u4Jr8txCneVcha57SXAb9vsDbs1lINg', serial
   }
 });
 
-app.listen(3000);
+User.sync({force: true}).then(function () {
+  return PrivateChat.sync({force: true});
+}).then(function () {
+  return Data.sync({force: true});
+}).then(function () {
+  return Credential.sync({force: true});
+}).then(function () {
+  return db.sync({force: true});
+}).then(function () {
+  app.listen(3000);
+});

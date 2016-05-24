@@ -13,6 +13,5 @@ module.exports = function (db, DataTypes) {
       allowNull: false
     }
   });
-  Credential.sync();
   return Credential;
 };

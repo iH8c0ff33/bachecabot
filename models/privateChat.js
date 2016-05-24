@@ -7,6 +7,5 @@ module.exports = function (db, DataTypes) {
       primaryKey: true
     }
   });
-  PrivateChat.sync();
   return PrivateChat;
 };

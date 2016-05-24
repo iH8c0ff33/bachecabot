@@ -10,6 +10,5 @@ module.exports = function (db, DataTypes) {
     last_name: DataTypes.STRING(),
     username: DataTypes.STRING()
   });
-  User.sync();
   return User;
 }
