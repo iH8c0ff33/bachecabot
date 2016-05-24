@@ -39,7 +39,7 @@ serializeUser(User, PrivateChat), function (req, res) {
           if (req.body.message.entities) {
             if (req.body.message.text.slice(req.body.message.entities[0].offset,
               req.body.message.entities[0].offset+req.body.message.entities[0]
-              .length).search(/^\/start(@sunCorp_bot)?$/) > -1) {
+              .length).search(/^\/cancel(@sunCorp_bot)?$/) > -1) {
               req.data.action.login = undefined;
               req.data.update(req.data).then(function () {
                 bot.sendMessage({
