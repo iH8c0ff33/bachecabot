@@ -37,7 +37,7 @@ app.all('/api/telegrambot/130906513:AAG6u4Jr8txCneVcha57SXAb9vsDbs1lINg', serial
     res.send('ERROR');
   }
   if (req.body.message.text) {
-    if (req.data) {
+    if (req.data.action) {
       if (req.data.action.login) {
         if (req.data.action.login.insert == 'school') {
             var actionToWrite = req.data.action;
