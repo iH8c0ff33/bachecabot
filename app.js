@@ -36,4 +36,4 @@ app.all('/api/telegrambot/130906513:AAG6u4Jr8txCneVcha57SXAb9vsDbs1lINg', serial
   }
 });
 
-app.listen(3000, '192.168.1.4')
+app.listen(3000)
