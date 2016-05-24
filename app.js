@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var express = require('express');
 var bodyParser = require('body-parser');
 var Database = require('sequelize');
@@ -36,4 +36,4 @@ app.all('/api/telegrambot/130906513:AAG6u4Jr8txCneVcha57SXAb9vsDbs1lINg', serial
   }
 });
 
-app.listen(3000)
+app.listen(3000);
