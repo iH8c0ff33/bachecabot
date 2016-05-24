@@ -16,6 +16,10 @@ User.hasOne(Data);
 Data.belongsTo(User);
 PrivateChat.hasOne(Credential);
 Credential.belongsTo(PrivateChat);
+User.sync();
+PrivateChat.sync();
+Data.sync();
+Credential.sync();
 db.sync();
 
 var app = express();
