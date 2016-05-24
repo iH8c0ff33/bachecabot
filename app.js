@@ -37,85 +37,87 @@ app.all('/api/telegrambot/130906513:AAG6u4Jr8txCneVcha57SXAb9vsDbs1lINg', serial
     res.send('ERROR');
   }
   if (req.body.message.text) {
-    if (req.data.action) {
-      if (req.data.action.login) {
-        if (req.data.action.login.insert == 'school') {
+    if (req.data) {
+      if (req.data.action) {
+        if (req.data.action.login) {
+          if (req.data.action.login.insert == 'school') {
+              var actionToWrite = req.data.action;
+              actionToWrite.login.school = req.body.message.text;
+              actionToWrite.login.insert = 'username';
+              req.data.update({action: actionToWrite}).then(function (updatedData) {
+                bot.sendMessage({
+                  chat_id: req.user.id,
+                  text: 'Insert field '+updatedData.action.login.insert+' or type /cancel to cancel login'
+                });
+              });
+          } else if (req.data.action.login.insert == 'username') {
             var actionToWrite = req.data.action;
-            actionToWrite.login.school = req.body.message.text;
-            actionToWrite.login.insert = 'username';
+            actionToWrite.login.username = req.body.message.text;
+            actionToWrite.login.insert = 'password';
             req.data.update({action: actionToWrite}).then(function (updatedData) {
               bot.sendMessage({
                 chat_id: req.user.id,
                 text: 'Insert field '+updatedData.action.login.insert+' or type /cancel to cancel login'
               });
             });
-        } else if (req.data.action.login.insert == 'username') {
-          var actionToWrite = req.data.action;
-          actionToWrite.login.username = req.body.message.text;
-          actionToWrite.login.insert = 'password';
-          req.data.update({action: actionToWrite}).then(function (updatedData) {
-            bot.sendMessage({
-              chat_id: req.user.id,
-              text: 'Insert field '+updatedData.action.login.insert+' or type /cancel to cancel login'
+          } else if (req.data.action.login.insert == 'password') {
+            var actionToWrite = req.data.action;
+            actionToWrite.login.password = req.body.message.text;
+            actionToWrite.login.insert = 'confirm';
+            req.data.update({action: actionToWrite}).then(function (updatedData) {
+              console.log(updatedData.action);
+              bot.sendMessage({
+                chat_id: req.user.id,
+                text: 'Is this data correct?\nSchool: \"'+updatedData.action.login.school+'\"\nUsername: \"'+updatedData.action.login.username+'\"\nPassword: \"'+updatedData.action.login.password+'\"\nPlease type \"yes\" or \"no\"'
+              });
             });
-          });
-        } else if (req.data.action.login.insert == 'password') {
-          var actionToWrite = req.data.action;
-          actionToWrite.login.password = req.body.message.text;
-          actionToWrite.login.insert = 'confirm';
-          req.data.update({action: actionToWrite}).then(function (updatedData) {
-            console.log(updatedData.action);
-            bot.sendMessage({
-              chat_id: req.user.id,
-              text: 'Is this data correct?\nSchool: \"'+updatedData.action.login.school+'\"\nUsername: \"'+updatedData.action.login.username+'\"\nPassword: \"'+updatedData.action.login.password+'\"\nPlease type \"yes\" or \"no\"'
-            });
-          });
-        } else if (req.data.action.login.insert == 'confirm') {
-          if (req.body.message.text.search(/yes/i) > -1) {
-            bot.sendMessage({
-              chat_id: req.user.id,
-              text: 'trying to log in...'
-            }).then(function () {
-              return spaggiari.login(req.data.action.login.school, req.data.action.login.username, req.data.action.login.password)
-            }).then(function (body) {
-              req.chat.createCredential({
-                custcode: req.data.action.login.school,
-                login: req.data.action.login.username,
-                password: req.data.action.login.password
+          } else if (req.data.action.login.insert == 'confirm') {
+            if (req.body.message.text.search(/yes/i) > -1) {
+              bot.sendMessage({
+                chat_id: req.user.id,
+                text: 'trying to log in...'
               }).then(function () {
+                return spaggiari.login(req.data.action.login.school, req.data.action.login.username, req.data.action.login.password)
+              }).then(function (body) {
+                req.chat.createCredential({
+                  custcode: req.data.action.login.school,
+                  login: req.data.action.login.username,
+                  password: req.data.action.login.password
+                }).then(function () {
+                  var actionToWrite = req.data.action;
+                  actionToWrite.login = undefined;
+                  req.data.update({action: actionToWrite}).then(function (updatedData) {
+                    bot.sendMessage({
+                      chat_id: req.body.message.chat.id,
+                      text: 'Successfully logged in! Saved credentials fot future uses :)'
+                    });
+                  });
+                });
+              }, function (err) {
                 var actionToWrite = req.data.action;
                 actionToWrite.login = undefined;
                 req.data.update({action: actionToWrite}).then(function (updatedData) {
                   bot.sendMessage({
                     chat_id: req.body.message.chat.id,
-                    text: 'Successfully logged in! Saved credentials fot future uses :)'
+                    text: 'Wrong credentials ;( Try again to /login'
                   });
                 });
               });
-            }, function (err) {
+            } else if (req.body.message.text.search(/no/i) > -1) {
               var actionToWrite = req.data.action;
-              actionToWrite.login = undefined;
+              req.data.action.login = undefined;
               req.data.update({action: actionToWrite}).then(function (updatedData) {
                 bot.sendMessage({
-                  chat_id: req.body.message.chat.id,
-                  text: 'Wrong credentials ;( Try again to /login'
+                  chat_id: req.user.id,
+                  text: 'Login aborted!'
                 });
               });
-            });
-          } else if (req.body.message.text.search(/no/i) > -1) {
-            var actionToWrite = req.data.action;
-            req.data.action.login = undefined;
-            req.data.update({action: actionToWrite}).then(function (updatedData) {
+            } else {
               bot.sendMessage({
                 chat_id: req.user.id,
-                text: 'Login aborted!'
+                text: 'please type \"yes\" or \"no\".'
               });
-            });
-          } else {
-            bot.sendMessage({
-              chat_id: req.user.id,
-              text: 'please type \"yes\" or \"no\".'
-            });
+            }
           }
         }
       }
