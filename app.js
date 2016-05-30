@@ -5,7 +5,7 @@ var Database = require('sequelize');
 var bot = require(__dirname+'/bot.js');
 var spaggiari = require(__dirname+'/spaggiari.js');
 
-var db = new Database('postgres://daniele@localhost:5432/telegram');
+var db = new Database('postgres://bot@'+process.env('POSTGRES_PORT_5432_TCP_ADDR')+':'+process.env('POSTGRES_PORT_5432_TCP_PORT')+'/telegram');
 var User = db.import(__dirname+'/models/user.js');
 var PrivateChat = db.import(__dirname+'/models/privateChat.js');
 var Data = db.import(__dirname+'/models/data.js');
