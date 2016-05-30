@@ -4,7 +4,7 @@ RUN apk update && apk add postgresql
 
 USER postgres
 RUN initdb -E UTF8 -D '/var/lib/postgresql/data'
-RUN postgres -D '/var/lib/postgresql/data'& \
+RUN postgres -D '/var/lib/postgresql/data'& sleep 1 &&\
 createuser bot && createdb -O bot telegram && \
 killall postgres
 
