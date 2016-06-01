@@ -1,6 +1,7 @@
 FROM alpine
 
 RUN apk update && apk add postgresql
+RUN mkdir -p '/var/lib/postgresql'
 
 USER postgres
 RUN initdb -E UTF8 -D '/var/lib/postgresql/data'
