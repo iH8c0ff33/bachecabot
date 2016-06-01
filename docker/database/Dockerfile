@@ -1,4 +1,4 @@
-FROM armbuild/alpine
+FROM alpine
 
 RUN apk update && apk add postgresql
 
