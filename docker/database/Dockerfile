@@ -1,15 +1,20 @@
 FROM alpine
+MAINTAINER Daniele Monteleone <daniele.monteleone.it@gmail.com>
 
-RUN apk update && apk add postgresql
-RUN mkdir -p '/var/lib/postgresql' && chown postgres:postgres \
-'/var/lib/postgresql'
+ENV DBPATH '/var/lib/postgresql'
+
+RUN apk add --update postgresql && \
+  mkdir -p $DBPATH && \
+  chown postgres:postgres $DBPATH
 
 USER postgres
-RUN initdb -E UTF8 -D '/var/lib/postgresql/data'
-RUN postgres -D '/var/lib/postgresql/data'& sleep 1 &&\
-createuser bot && createdb -O bot telegram && \
-killall postgres
-RUN sed -i s/'127.0.0.1\/32'/'0.0.0.0\/0'/ '/var/lib/postgresql/data/pg_hba.conf'
+RUN initdb -E UTF8 -D $DBPATH/data && \
+  pg_ctl start -D $DBPATH/data && \
+  sleep 1 && \
+  createuser bot && \
+  createdb -O bot telegram && \
+  killall postgres && \
+  sed -i s/'127.0.0.1\/32'/'0.0.0.0\/0'/ $DBPATH/data/pg_hba.conf
 
 EXPOSE 5432
-CMD ["postgres", "-h", "0.0.0.0", "-p", "5432", "-D", "/var/lib/postgresql/data"]
+CMD postgres -h 0.0.0.0 -p 5432 -D $DBPATH/data
